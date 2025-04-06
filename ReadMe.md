@@ -29,7 +29,7 @@ sudo apt install qemu-system-arm
 
 MacOS:
 ```bash
-# For the toolchain (Ubuntu/Debian example)
+# For the toolchain
 brew install aarch64-elf-gcc aarch64-elf-binutils
 
 # For QEMU
