@@ -10,8 +10,12 @@ boot.o: boot.S
 %.o: %.c
 	aarch64-elf-gcc $(GCCFLAGS) -c $< -o $@
 
-kernel8.img: boot.o $(OFILES)
-	aarch64-elf-ld -nostdlib boot.o $(OFILES) -T linker.ld -o kernel8.elf
+
+font.o : font.sfn
+	aarch64-elf-ld -r -b binary font.sfn -o font.o
+
+kernel8.img: boot.o $(OFILES) font.o
+	aarch64-elf-ld -nostdlib boot.o $(OFILES) font.o -T linker.ld -o kernel8.elf
 	aarch64-elf-objcopy -O binary kernel8.elf kernel8.img
 
 run:
