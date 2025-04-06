@@ -16,7 +16,7 @@ To build and run RaspiOS, you’ll need the following tools:
 - **AArch64 ELF Toolchain**: Required for compiling the OS for the Raspberry Pi 4’s AArch64 architecture. Install the `aarch64-elf-toolchain` or a similar toolchain.
 - **QEMU Emulation Layer**: Used to emulate the Raspberry Pi 4 environment. Ensure you have `qemu-system-aarch64` installed.
 
-### Suggested Installation (Linux)
+### Suggested Installation
 
 Debian based system:
 ```bash
