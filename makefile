@@ -1,6 +1,6 @@
 CFILES = $(wildcard *.c drivers/*.c)
 OFILES = $(CFILES:.c=.o)
-GCCFLAGS = -Wall -ffreestanding -nostdlib -nostartfiles -mstrict-align -Iinclude
+GCCFLAGS = -Wall -O2 -ffreestanding -nostdlib -nostartfiles -mstrict-align -Iinclude
 
 all: clean kernel8.img
 
@@ -18,6 +18,7 @@ run:
 	qemu-system-aarch64 \
     -M raspi4b \
 	-cpu cortex-a72 \
+	-accel tcg \
     -kernel kernel8.img \
     -m 2048 \
     -serial stdio \
