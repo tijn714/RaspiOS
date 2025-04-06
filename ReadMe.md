@@ -1,13 +1,13 @@
 # RaspiOS
 
-A custom operating system for the Raspberry Pi 4, built from scratch for the AArch64 architecture.
+A hobby operating system for the Raspberry Pi 4, built from scratch for the AArch64 architecture.
 
 **Developer**: Tijn Rodrigo ([@tijn714](https://github.com/tijn714))  
 **Project Name**: RaspiOS  
 
 ## Overview
 
-RaspiOS is a lightweight, custom-built hobby operating system designed for the Raspberry Pi 4, targeting the AArch64 architecture. As more companies shift toward AArch64, this project aims to provide a minimal yet functional OS for enthusiasts and developers.
+RaspiOS is a lightweight, custom-built hobby operating system designed for the Raspberry Pi 4, targeting the AArch64 architecture. As more companies shift toward AArch64, this project aims to provide a minimal yet functional OS for people who are interesed in AArch64 OS development.
 
 ## Requirements
 
@@ -16,16 +16,26 @@ To build and run RaspiOS, you’ll need the following tools:
 - **AArch64 ELF Toolchain**: Required for compiling the OS for the Raspberry Pi 4’s AArch64 architecture. Install the `aarch64-elf-toolchain` or a similar toolchain.
 - **QEMU Emulation Layer**: Used to emulate the Raspberry Pi 4 environment. Ensure you have `qemu-system-aarch64` installed.
 
-### Suggested Installation (Linux/macOS)
+### Suggested Installation
+
+Debian based system:
 ```bash
-# For the toolchain (Ubuntu/Debian example)
+# For the toolchain
 sudo apt install gcc-aarch64-linux-gnu
 
-# For QEMU
+# Qemu
 sudo apt install qemu-system-arm
 ```
 
-*Note*: macOS users may need to use Homebrew (`brew install qemu`) or adjust paths accordingly.
+MacOS:
+```bash
+# For the toolchain
+brew install aarch64-elf-gcc aarch64-elf-binutils
+
+# For QEMU
+brew install qemu
+```
+
 
 ## Building the Project
 
@@ -47,7 +57,7 @@ sudo apt install qemu-system-arm
    ```
    This launches the OS in an emulated Raspberry Pi 4 environment.
 
-*Note*: The `make run` command is optimized for macOS (Cocoa framework). Users on other systems (e.g., Linux or Windows) might need to tweak the QEMU command in the `Makefile` to match their setup.
+*Note*: The `make run` command is optimized for macOS (Cocoa framework is used for the GUI). Users on other systems (e.g., Linux or Windows) might need to modify the QEMU command in the `Makefile` to match their setup.
 
 ## Collaboration
 
