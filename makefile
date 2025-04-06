@@ -1,6 +1,6 @@
 CFILES = $(wildcard *.c drivers/*.c)
 OFILES = $(CFILES:.c=.o)
-GCCFLAGS = -Wall -O2 -ffreestanding -nostdlib -nostartfiles -mstrict-align -Iinclude
+GCCFLAGS = -Wall -O2 -ffreestanding -nostdlib -nostartfiles -fno-stack-protector -mstrict-align -Iinclude
 
 all: clean kernel8.img
 
