@@ -4,41 +4,8 @@
 #include "fb.h"
 #include <stdbool.h>
 
-// Define the FramebufferInfo struct
-typedef struct {
-    unsigned int width;
-    unsigned int height;
-    unsigned int virtual_width;
-    unsigned int virtual_height;
-    unsigned int x_offset;
-    unsigned int y_offset;
-    unsigned int depth;
-    unsigned int pixel_order; // 0 for BGR, 1 for RGB
-    unsigned char *pointer;
-    unsigned int size;
-    unsigned int pitch;
-} FramebufferInfo;
-
-typedef struct {
-    unsigned char  magic[4];
-    unsigned int   size;
-    unsigned char  type;
-    unsigned char  features;
-    unsigned char  width;
-    unsigned char  height;
-    unsigned char  baseline;
-    unsigned char  underline;
-    unsigned short fragments_offs;
-    unsigned int   characters_offs;
-    unsigned int   ligature_offs;
-    unsigned int   kerning_offs;
-    unsigned int   cmap_offs;
-} __attribute__((packed)) sfn_t;
-extern volatile unsigned char _binary_font_sfn_start[];
-
 // Declare a global instance of the structs.
 FramebufferInfo fb_info;
-sfn_t ssfn_font;
 
 void fb_init()
 {
@@ -110,10 +77,6 @@ void fb_init()
         fb_info.pointer = (void*)((unsigned long)mbox[28]);
         fb_info.size = mbox[29];
         fb_info.pitch = mbox[33];
-
-
-        ssfn_font.width = 32;
-        ssfn_font.height = 32;
     } else {
         uart_puts("Unable to set screen resolution to 1024x768x32\n");
     }
@@ -134,27 +97,29 @@ void put_pixel(int x, int y, unsigned int attribute)
     *((unsigned int*)(fb_info.pointer + pixel_offset)) = attribute;
 }
 
-void putchar(int x, int y, char c, unsigned int attribute) {
+void putchar(int x, int y, const char *c_utf8, unsigned int attribute) {
+    uint32_t code_point = 0;
+
+    uart_puts(c_utf8);
+
+    unsigned char c0 = c_utf8[0];
+    if ((c0 & 0x80) == 0x00) {
+        code_point = c0;
+    } else if ((c0 & 0xE0) == 0xC0) {
+        code_point = ((c0 & 0x1F) << 6) | (c_utf8[1] & 0x3F);
+    } else if ((c0 & 0xF0) == 0xE0) {
+        code_point = ((c0 & 0x0F) << 12) | ((c_utf8[1] & 0x3F) << 6) | (c_utf8[2] & 0x3F);
+    } else if ((c0 & 0xF8) == 0xF0) {
+        code_point = ((c0 & 0x07) << 18) | ((c_utf8[1] & 0x3F) << 12) |
+                     ((c_utf8[2] & 0x3F) << 6) | (c_utf8[3] & 0x3F);
+    } else {
+        return; // Invalid UTF-8
+    }
+
     sfn_t *font = (sfn_t*)&_binary_font_sfn_start;
     unsigned char *ptr, *chr, *frg;
-    unsigned int code_point;
     unsigned long o, p;
     int i, j, k, l, m, n;
-
-    // Handle UTF-8 to Unicode code point conversion if needed
-    if((c & 0x80) != 0) {
-        if((c & 0x20) == 0) { // 2-byte UTF-8
-            code_point = ((c & 0x1F) << 6) | (c & 0x3F);
-        } else if((c & 0x10) == 0) { // 3-byte UTF-8
-            code_point = ((c & 0xF) << 12) | ((c & 0x3F) << 6) | (c & 0x3F);
-        } else if((c & 0x08) == 0) { // 4-byte UTF-8
-            code_point = ((c & 0x7) << 18) | ((c & 0x3F) << 12) | ((c & 0x3F) << 6) | (c & 0x3F);
-        } else {
-            code_point = 0;
-        }
-    } else {
-        code_point = c; // ASCII char
-    }
 
     // Find the character in the SSFN font table
     for(ptr = (unsigned char*)font + font->characters_offs, chr = 0, i = 0; i < 0x110000; i++) {
@@ -177,32 +142,31 @@ void putchar(int x, int y, char c, unsigned int attribute) {
         }
     }
 
-    if(!chr) return; // Character not found, return early.
+    if(!chr) return;
 
-    // Uncompress and display the fragments
+    // Render character
     ptr = chr + 6;
-    o = (unsigned long)fb_info.pointer + y * fb_info.pitch + x * 4; // Calculate the pixel offset
+    o = (unsigned long)fb_info.pointer + y * fb_info.pitch + x * 4;
     for(i = n = 0; i < chr[1]; i++, ptr += chr[0] & 0x40 ? 6 : 5) {
-        if(ptr[0] == 255 && ptr[1] == 255) continue; // Skip empty fragments
-        frg = (unsigned char*)font + (chr[0] & 0x40 ? 
+        if(ptr[0] == 255 && ptr[1] == 255) continue;
+        frg = (unsigned char*)font + (chr[0] & 0x40 ?
             ((ptr[5] << 24) | (ptr[4] << 16) | (ptr[3] << 8) | ptr[2]) :
             ((ptr[4] << 16) | (ptr[3] << 8) | ptr[2]));
-        
-        if((frg[0] & 0xE0) != 0x80) continue; // Skip invalid fragments
 
-        o += (int)(ptr[1] - n) * fb_info.pitch; // Update offset for next fragment
+        if((frg[0] & 0xE0) != 0x80) continue;
+
+        o += (int)(ptr[1] - n) * fb_info.pitch;
         n = ptr[1];
 
-        k = ((frg[0] & 0x1F) + 1) << 3; // Character width
-        j = frg[1] + 1; // Character height
-        frg += 2; // Move to the next fragment data
-        
-        // Loop through the fragment data to render pixels
+        k = ((frg[0] & 0x1F) + 1) << 3;
+        j = frg[1] + 1;
+        frg += 2;
+
         for(m = 1; j; j--, n++, o += fb_info.pitch) {
             for(p = o, l = 0; l < k; l++, p += 4, m <<= 1) {
-                if(m > 0x80) { frg++; m = 1; } // Move to the next byte if necessary
+                if(m > 0x80) { frg++; m = 1; }
                 if(*frg & m) {
-                    *((unsigned int*)p) = attribute; // Set the pixel color (attribute)
+                    *((unsigned int*)p) = attribute;
                 }
             }
         }
