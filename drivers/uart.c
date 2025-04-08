@@ -51,6 +51,9 @@ void uart_init()
     *UART0_FBRD = 0xB;
     *UART0_LCRH = 0b11<<5; // 8n1
     *UART0_CR = 0x301;     // enable Tx, Rx, FIFO
+
+
+    uart_puts("UART initialized.\n");
 }
 
 void uart_send(unsigned int c) {

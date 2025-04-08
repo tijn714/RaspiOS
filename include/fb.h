@@ -7,6 +7,8 @@ typedef struct {
     unsigned int height;
     unsigned int virtual_width;
     unsigned int virtual_height;
+    unsigned int foreground; // Default RGB Value of foreground (0xRRGGBB)
+    unsigned int background; // Default RGB Value of background (0xRRGGBB)
     unsigned int x_offset;
     unsigned int y_offset;
     unsigned int depth;

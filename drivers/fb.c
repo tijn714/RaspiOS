@@ -77,6 +77,8 @@ void fb_init()
         fb_info.pointer = (void*)((unsigned long)mbox[28]);
         fb_info.size = mbox[29];
         fb_info.pitch = mbox[33];
+
+        uart_puts("Framebuffer initialized.\n");
     } else {
         uart_puts("Unable to set screen resolution to 1024x768x32\n");
     }
