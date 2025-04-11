@@ -1,10 +1,19 @@
 #include "uart.h"
 #include "fb.h"
+#include "mm.h"
 
 void main() {
     uart_init();
     fb_init();
     uart_puts("Welcome to RaspiOS!\n");
+
+    extern int get_arm_memory_size();
+
+    int ram = get_arm_memory_size();
+
+    uart_puts("RAM size: ");
+    uart_hex((unsigned int)ram);
+    uart_puts("\n");
 
     putchar(10, 10, "H", 0xFFFFFF);
     putchar(18, 10, "o", 0xFFFFFF);

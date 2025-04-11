@@ -22,5 +22,6 @@ extern volatile unsigned int mbox[36];
 #define MBOX_TAG_LAST           0
 
 int mbox_call(unsigned char ch);
+int get_arm_memory_size();
 
 #endif // MBOX_H

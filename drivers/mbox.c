@@ -32,3 +32,21 @@ int mbox_call(unsigned char ch)
     }
     return 0;
 }
+
+int get_arm_memory_size() {
+    mbox[0] = 8 * 4;                // size of the message buffer (in bytes)
+    mbox[1] = 0x00000000;           // request code
+    mbox[2] = 0x00010005;           // tag identifier (GET_ARM_MEMORY)
+    mbox[3] = 8;                    // value buffer size
+    mbox[4] = 0;                    // request size
+    mbox[5] = 0;                    // response: base address (filled by VC)
+    mbox[6] = 0;                    // response: size (filled by VC)
+    mbox[7] = 0;                    // end tag
+
+    if (mbox_call(8)) {            // Channel 8 is the property channel
+        // RAM size is in mbox[6]
+        return mbox[6];
+    } else {
+        return -1; // failed
+    }
+}
