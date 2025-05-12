@@ -1,19 +1,25 @@
+#include <stdint.h>
 #include "uart.h"
 #include "fb.h"
-#include "mm.h"
+#include "dtb.h"
 
 void main() {
     uart_init();
     fb_init();
-    uart_puts("Welcome to RaspiOS!\n");
 
-    extern int get_arm_memory_size();
+    extern uint64_t fetch_dtb0(void);
 
-    int ram = get_arm_memory_size();
+    uint32_t dtb0_magic = 0x44544230;
+    volatile uint32_t* dtb_ptr = (uint32_t*)fetch_dtb0();
 
-    uart_puts("RAM size: ");
-    uart_hex((unsigned int)ram);
-    uart_puts("\n");
+    if (*dtb_ptr != dtb0_magic) {
+        uart_puts("An error occurred when fetching the DTB0; halting...\n");
+        while (1) {}
+    }
+
+    parse_dtb((uint8_t*)dtb_ptr);
+
+    uart_puts("Welcome to RaspiOS!\n\n");
 
     putchar(10, 10, "H", 0xFFFFFF);
     putchar(18, 10, "o", 0xFFFFFF);

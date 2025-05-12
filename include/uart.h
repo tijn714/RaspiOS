@@ -9,5 +9,7 @@ char uart_getc();
 void uart_putc(char c);
 void uart_puts(char *s);
 void uart_hex(unsigned int d);
+void uart_hex64(uint64_t val);
+void uart_dec(uint32_t val);
 
 #endif // UART_H

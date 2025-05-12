@@ -98,3 +98,29 @@ void uart_hex(unsigned int d) {
         uart_send(n);
     }
 }
+
+void uart_hex64(uint64_t val) {
+    uart_puts("0x");
+    for (int i = 60; i >= 0; i -= 4) {
+        uint8_t nibble = (val >> i) & 0xF;
+        uart_putc(nibble < 10 ? ('0' + nibble) : ('A' + nibble - 10));
+    }
+}
+
+void uart_dec(uint32_t val) {
+    char buf[11];
+    int i = 10;
+    buf[i--] = '\0';
+
+    if (val == 0) {
+        uart_putc('0');
+        return;
+    }
+
+    while (val && i >= 0) {
+        buf[i--] = '0' + (val % 10);
+        val /= 10;
+    }
+
+    uart_puts(&buf[i + 1]);
+}
