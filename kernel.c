@@ -1,23 +1,17 @@
 #include <stdint.h>
 #include "uart.h"
 #include "fb.h"
-#include "dtb.h"
 
 void main() {
     uart_init();
     fb_init();
 
-    extern uint64_t fetch_dtb0(void);
+	volatile uint64_t dtb_address = dtb_ptr;
+  	uint32_t *dtb = (uint32_t *)(uint64_t)dtb_ptr;
 
-    uint32_t dtb0_magic = 0x44544230;
-    volatile uint32_t* dtb_ptr = (uint32_t*)fetch_dtb0();
+	uart_hex(dtb_ptr);       // Should show a high address, e.g., 0x1F000000
+	uart_hex(dtb[0]);        // Should print D00DFEED (possibly byte-swapped)
 
-    if (*dtb_ptr != dtb0_magic) {
-        uart_puts("An error occurred when fetching the DTB0; halting...\n");
-        while (1) {}
-    }
-
-    parse_dtb((uint8_t*)dtb_ptr);
 
     uart_puts("Welcome to RaspiOS!\n\n");
 

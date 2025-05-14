@@ -12,4 +12,6 @@ void uart_hex(unsigned int d);
 void uart_hex64(uint64_t val);
 void uart_dec(uint32_t val);
 
+extern uint64_t dtb_ptr;
+
 #endif // UART_H

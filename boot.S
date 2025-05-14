@@ -5,6 +5,10 @@ _start:
     // Save DTB address from x0
     mov    x20, x0         // Save DTB pointer in x20
 
+    // Store DTB pointer to global variable
+    ldr    x1, =dtb_ptr
+    str    x20, [x1]
+
     // Get CPU ID from MPIDR_EL1
     mrs    x1, mpidr_el1
     and    x1, x1, #0x3    // Mask to get CPU ID (0-3)
@@ -21,7 +25,6 @@ fetch_dtb0:
     ret
 
 core0_run:
-    // Set stack pointer (choose an appropriate address)
     mov    sp, #0x80000
 
     // Clear BSS section
@@ -30,14 +33,22 @@ core0_run:
 bss_loop:
     cmp    x1, x2
     bge    bss_done
-    str    xzr, [x1], #8   // Zero out 8 bytes at a time
+    str    xzr, [x1], #8
     b      bss_loop
 bss_done:
 
-    // Overwrite DTB magic with 0x44544230 ("DTB0")
-    ldr    x1, =0x44544230     // Value to write
-    str    w1, [x20]           // Write 32-bit value to DTB address
+    ldr    x1, =dtb_ptr
+    str    x20, [x1]
 
-    // Jump to main() in C
+    ldr    x1, =0x44544230
+    str    w1, [x20]
+
     bl     main
-    b      halt                // Shouldn't return, but halt if it does
+    b      halt
+
+// Reserve space for DTB pointer (C-accessible)
+.section .bss
+.align 8
+.global dtb_ptr
+dtb_ptr:
+    .skip 8   // Reserve 8 bytes for uint64_t DTB pointer

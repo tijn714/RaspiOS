@@ -20,13 +20,15 @@ kernel8.img: boot.o $(OFILES) font.o
 
 run:
 	qemu-system-aarch64 \
-    -M raspi4b \
-	-cpu cortex-a72 \
-	-accel tcg \
-    -kernel kernel8.img \
-    -m 2048 \
-    -serial stdio \
-    -display cocoa
+        -M raspi4b \
+        -cpu cortex-a72 \
+        -accel tcg \
+        -kernel kernel8.img \
+        -dtb bcm2711-rpi-4-b.dtb \
+        -m 2048 \
+        -serial stdio \
+        -display cocoa
+
 
 clean:
 	rm -rf kernel8.elf *.o *.img > /dev/null 2> /dev/null || true
