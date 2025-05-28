@@ -1,7 +1,7 @@
-#include "gpio.h"
-#include "uart.h"
-#include "mbox.h"
-#include "delays.h"
+#include "kernel/gpio.h"
+#include "kernel/uart.h"
+#include "kernel/mbox.h"
+#include "kernel/delays.h"
 
 /* PL011 UART registers */
 #define UART0_DR        ((volatile unsigned int*)(PERIPHERAL_BASE+0x00201000))

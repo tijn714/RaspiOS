@@ -7,16 +7,17 @@ typedef struct {
     unsigned int height;
     unsigned int virtual_width;
     unsigned int virtual_height;
-    unsigned int foreground; // Default RGB Value of foreground (0xRRGGBB)
-    unsigned int background; // Default RGB Value of background (0xRRGGBB)
+    unsigned int foreground; // 0xRRGGBB
+    unsigned int background; // 0xRRGGBB
     unsigned int x_offset;
     unsigned int y_offset;
     unsigned int depth;
-    unsigned int pixel_order; // 0 for BGR, 1 for RGB
+    unsigned int pixel_order; // 0 = BGR, 1 = RGB
     unsigned char *pointer;
     unsigned int size;
     unsigned int pitch;
 } FramebufferInfo;
+
 
 typedef struct {
     unsigned char  magic[4];
@@ -36,7 +37,10 @@ typedef struct {
 extern volatile unsigned char _binary_font_sfn_start[];
 
 void fb_init();
+void kput(const char *utf8_str, unsigned int attribute);
 void put_pixel(int x, int y, unsigned int attribute);
-void putchar(int x, int y, const char *c_utf8, unsigned int attribute);
+void clear_screen(unsigned int attribute);
+void draw_glyph(int x, int y, const char *c_utf8, unsigned int attribute);
+int printk(const char *fmt, ...);
 
 #endif // FB_H

@@ -4,8 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef unsigned int size_t;
-#define NULL ((void*)0UL)
+#include "common/types.h"
 
 // strlen
 size_t strlen(const char* str);
@@ -29,7 +28,6 @@ int strncmp(const char* str1, const char* str2, size_t num);
 int strcmp(const char* str1, const char* str2);
 
 // is functions
-bool isEqual(const uint8_t* a, const uint8_t* b, size_t size);
 bool isint(char c);
 
 int isspace(char c);

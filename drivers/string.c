@@ -1,6 +1,6 @@
-#include "string.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include "common/types.h"
 
 size_t strlen(const char* str) {
     size_t len = 0;
@@ -60,6 +60,15 @@ void* memcpy(void* dest, const void* src, size_t num) {
     return dest;
 }
 
+bool isEqual(const uint8_t* a, const uint8_t* b, size_t size) {
+    for (size_t i = 0; i < size; i++) {
+        if (a[i] != b[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 char* strstr(const char* haystack, const char* needle) {
     size_t needle_len = strlen(needle);
     if (needle_len == 0) {
@@ -98,15 +107,6 @@ int strcmp(const char* str1, const char* str2) {
         return len1 - len2;
     }
     return strncmp(str1, str2, len1);
-}
-
-bool isEqual(const uint8_t* a, const uint8_t* b, size_t size) {
-    for (size_t i = 0; i < size; i++) {
-        if (a[i] != b[i]) {
-            return false;
-        }
-    }
-    return true;
 }
 
 bool isint(char c) {

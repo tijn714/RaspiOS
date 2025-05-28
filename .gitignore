@@ -3,3 +3,6 @@
 *.o
 /.vscode
 .DS_Store
+/fonts/*.sfn
+
+\.idea

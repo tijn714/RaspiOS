@@ -1,4 +1,4 @@
-#include "gpio.h"
+#include "kernel/gpio.h"
 
 #define SYSTMR_LO        ((volatile unsigned int*)(PERIPHERAL_BASE+0x00003004))
 #define SYSTMR_HI        ((volatile unsigned int*)(PERIPHERAL_BASE+0x00003008))
